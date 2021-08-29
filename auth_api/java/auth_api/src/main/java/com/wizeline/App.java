@@ -7,6 +7,7 @@ import static spark.Spark.*;
 
 import com.wizeline.exception.WizeLineException;
 import com.wizeline.exception.DataBaseConnectionException;
+import com.wizeline.exception.UnauthorizedException;
 
 public class App {
     public static void main(String[] args) {
@@ -17,6 +18,12 @@ public class App {
         get("/_health", App::routeRoot);
         post("/login", App::urlLogin, json());
         get("/protected", App::protect, json());
+
+        exception(UnauthorizedException.class, (e, request, response) -> {
+            response.status(401);
+            response.type("application/json");
+            response.body(e.getMessage());
+        });
 
         exception(WizeLineException.class, (e, request, response) -> {
             response.status(403);
